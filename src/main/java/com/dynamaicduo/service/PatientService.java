@@ -13,35 +13,52 @@ public class PatientService extends Service{
     }
 
     @Override
-    public void parseRequestSpecification(){
-
-    };
-
-    @Override
-    public Object handleRequest(){
-        LOG.info("handle in service: {}", "patient");
-        Object result = null;
+    protected void handleGetRequest(){
         try{
-            switch(this.httpMethod){
-                case "GET":
-                    Patient patient = new Patient().get(this.userId);
-                    result = patient;
-                    break;
-                case "POST":
-                    break;
-                case "DELETE":
-                    break;
-                case "PUT":
-                    break;
-                default:
-                    break;
-            }
-        }catch(Exception ex){
-            LOG.error("Error " + ex);
+            Patient patient = new Patient().get(this.userId);
+            this.result = patient;
+        }catch (Exception ex){
+            LOG.error("error: {}", ex);
         }
-        
-        return result;
+
+    }
+    
+    @Override
+    protected void handlePostRequest(){
+        try{
+            Map<String, Object> attributes = new HashMap<>();
+
+            // attributes.put("userId", body.get("userId").asText());
+            // attributes.put("email", body.get("email").asText());
+            // attributes.put("username", body.get("username").asText());
+            // attributes.put("dateOfBirth", body.get("dateOfBirth").asText());
+            // attributes.put("gender", body.get("gender").asText());
+            // attributes.put("chronicCondition", body.get("alexaPin").asText());
+            // attributes.put("userId", body.get("userId").asText());
+            // attributes.put("userId", body.get("userId").asText());
+
+
+
+
+            Patient patient = new Patient();
+            patient.save();
+        }catch (Exception ex){
+            LOG.error("error: {}", ex);
+        }
     }
 
-    
+    @Override
+    protected void handlePutRequest(){
+
+    }
+
+    @Override
+    protected void handlePatchRequest(){
+
+    }
+
+    @Override
+    protected void handleDeleteRequest(){
+
+    }
 }

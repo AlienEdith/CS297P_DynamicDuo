@@ -15,6 +15,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
@@ -52,6 +53,9 @@ public class Patient {
         this.recordTime = recordTime;
     }
 
+    public void setAttributes(Map<String, Object> attributes){
+        this.attributes = attributes;
+    }
     // @DynamoDBAttribute(attributeName = "price")
     // public Float getPrice() {
     //     return this.price;
@@ -78,15 +82,6 @@ public class Patient {
         return this.client.describeTable(PATIENT_TABLE_NAME).getTable().getTableStatus().equals("ACTIVE");
     }
 
-    // public List<Product> list() throws IOException {
-    //   DynamoDBScanExpression scanExp = new DynamoDBScanExpression();
-    //   List<Product> results = this.mapper.scan(Product.class, scanExp);
-    //   for (Product p : results) {
-    //     logger.info("Products - list(): " + p.toString());
-    //   }
-    //   return results;
-    // }
-
     public Patient get(String userId) throws IOException {
         Patient patient = null;
 
@@ -99,26 +94,27 @@ public class Patient {
             .withExpressionAttributeValues(attributeValue);
 
         PaginatedQueryList<Patient> result = this.mapper.query(Patient.class, queryExp);
-        if (result.size() > 0) {
-          patient = result.get(0);
-          LOG.info("patient - get(): patient - " + patient.toString());
-        } else {
-          LOG.info("patient - get(): patient - Not Found.");
-        }
+        if (result.size() > 0) patient = result.get(0);
+
         return patient;
     }
 
-    public void save(Patient patient) throws IOException {
-        // logger.info("Products - save(): " + product.toString());
-        this.mapper.save(patient);
+    public void save() throws IOException {
+        Map<String,AttributeValue> attributeValue = new HashMap<String,AttributeValue>();
+        attributeValue.put("userId", new AttributeValue().withS("2"));
+        attributeValue.put("recordTime", new AttributeValue().withS("what"));
+        client.putItem(PATIENT_TABLE_NAME, attributeValue);
+        
     }
 
-    // public Boolean delete(String id) throws IOException {
-    //     Product product = null;
+    // public List<>
+
+    // public Boolean delete(String userId) throws IOException {
+    //     Patient patient = null;
 
     //     // get product if exists
-    //     product = get(id);
-    //     if (product != null) {
+    //     patient = get(id);
+    //     if (product != userId) {
     //       logger.info("Products - delete(): " + product.toString());
     //       this.mapper.delete(product);
     //     } else {

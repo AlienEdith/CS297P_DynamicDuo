@@ -11,13 +11,27 @@ public class ReportService extends Service{
     }
 
     @Override
-    public void parseRequestSpecification(){
-
-    };
+    protected void handleGetRequest(){
+        LOG.info("handle in service: {}", "report");
+    }
 
     @Override
-    public Object handleRequest() {
-        LOG.info("handle in service: {}", "reports");
-        return null;
+    protected void handlePostRequest(){
+
+    }
+
+    @Override
+    protected void handlePutRequest(){
+
+    }
+
+    @Override
+    protected void handlePatchRequest(){
+
+    }
+
+    @Override
+    protected void handleDeleteRequest(){
+
     }
 }

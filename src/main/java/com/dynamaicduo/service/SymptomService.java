@@ -11,13 +11,27 @@ public class SymptomService extends Service{
     }
 
     @Override
-    public void parseRequestSpecification(){
-
-    };
+    protected void handleGetRequest(){
+        LOG.info("handle in service: {}", "symptom");
+    }
 
     @Override
-    public Object handleRequest() {
-        LOG.info("handle in service: {}", "symptom");
-        return null;
+    protected void handlePostRequest(){
+
+    }
+
+    @Override
+    protected void handlePutRequest(){
+
+    }
+
+    @Override
+    protected void handlePatchRequest(){
+
+    }
+
+    @Override
+    protected void handleDeleteRequest(){
+
     }
 }

@@ -1,5 +1,7 @@
 package com.dynamicduo.service;
 
+// import com.dynamicduo.utils.HttpMethod;
+
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +19,8 @@ abstract public class Service {
 
     protected final Logger LOG = LogManager.getLogger(this.getClass());
 
+    protected Object result = null;
+
     public Service(String userId, String path, String httpMethod, Map<String,String> pathParameters, Map<String,String> queryStringParameters, JsonNode body){
         this.userId = userId;
         this.path = path;
@@ -26,7 +30,37 @@ abstract public class Service {
         this.body = body;
     }
 
-    public abstract void parseRequestSpecification();
+    protected void parseHttpMethod() {
+        switch(this.httpMethod){
+            case "GET":
+                handleGetRequest();
+                break;
+            case "POST":
+                handlePostRequest();
+                break;
+            case "PUT":
+                handlePutRequest();
+                break;
+            case "PATCH":
+                handlePatchRequest();
+                break;
+            case "DELETE":
+                handleDeleteRequest();
+                break;
+            default:
+                break;
+        }
+    }
 
-    public abstract Object handleRequest();
+    protected abstract void handleGetRequest();
+    protected abstract void handlePostRequest();
+    protected abstract void handlePutRequest();
+    protected abstract void handlePatchRequest();
+    protected abstract void handleDeleteRequest();
+    
+    public Object handleRequest(){
+        parseHttpMethod();
+
+        return result;
+    };
 }

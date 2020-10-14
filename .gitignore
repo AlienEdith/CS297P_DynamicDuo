@@ -15,3 +15,7 @@ target
 
 # credentials
 creds.json
+
+# npm
+node_modules
+package-lock.json
