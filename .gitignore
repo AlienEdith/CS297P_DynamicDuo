@@ -1,0 +1,21 @@
+*.class
+target
+/bin/
+/.settings/
+.project
+.classpath
+
+# Package Files
+*.jar
+*.war
+*.ear
+
+# Serverless directories
+.serverless
+
+# credentials
+creds.json
+
+# npm
+node_modules
+package-lock.json
