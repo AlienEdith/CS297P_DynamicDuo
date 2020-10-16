@@ -53,9 +53,9 @@ public class Patient {
         this.recordTime = recordTime;
     }
 
-    public void setAttributes(Map<String, Object> attributes){
-        this.attributes = attributes;
-    }
+    // public void setAttributes(Map<String, Object> attributes){
+    //     this.attributes = attributes;
+    // }
     // @DynamoDBAttribute(attributeName = "price")
     // public Float getPrice() {
     //     return this.price;
@@ -82,7 +82,7 @@ public class Patient {
         return this.client.describeTable(PATIENT_TABLE_NAME).getTable().getTableStatus().equals("ACTIVE");
     }
 
-    public Patient get(String userId) throws IOException {
+    public Patient getUser(String userId) throws IOException {
         Patient patient = null;
 
         HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
@@ -99,29 +99,35 @@ public class Patient {
         return patient;
     }
 
-    public void save() throws IOException {
+    public void save(Map<String, Object> attributes) throws IOException {
         Map<String,AttributeValue> attributeValue = new HashMap<String,AttributeValue>();
-        attributeValue.put("userId", new AttributeValue().withS("2"));
-        attributeValue.put("recordTime", new AttributeValue().withS("what"));
+        for(String key : attributes.keySet()){
+            attributeValue.put(key, new AttributeValue().withS(attributes.get(key)));
+
+        }
+        // attributeValue.put("recordTime", new AttributeValue().withS("what"));
         client.putItem(PATIENT_TABLE_NAME, attributeValue);
         
     }
 
     // public List<>
 
-    // public Boolean delete(String userId) throws IOException {
-    //     Patient patient = null;
+    public Boolean deleteUser(String userId) throws IOException {
 
-    //     // get product if exists
-    //     patient = get(id);
-    //     if (product != userId) {
-    //       logger.info("Products - delete(): " + product.toString());
-    //       this.mapper.delete(product);
-    //     } else {
-    //       logger.info("Products - delete(): product - does not exist.");
-    //       return false;
-    //     }
-    //     return true;
-    // }
+        HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
+        attributeValue.put(":userId", new AttributeValue().withS(userId));
+
+        DynamoDBQueryExpression<Patient> queryExp = new DynamoDBQueryExpression<Patient>()
+            .withKeyConditionExpression("userId = :userId")
+            .withExpressionAttributeValues(attributeValue);
+
+        PaginatedQueryList<Patient> patients = this.mapper.query(Patient.class, queryExp);
+        
+        if(patients.size() == 0)    return false;
+
+        this.mapper.batchDelete(patients);
+        
+        return true;
+    }
 
 }

@@ -57,8 +57,11 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 			LOG.info("pathParameters: {}", pathParameters);
 			Map<String,String> queryStringParameters =  (Map<String,String>)input.get("queryStringParameters");
 			LOG.info("queryStringParameters: {}", queryStringParameters);
-			// JsonNode body = new ObjectMapper().readTree((String) input.get("body"));
+
 			JsonNode body = null;
+			if(input.get("body") != null)	
+				body = new ObjectMapper().readTree((String) input.get("body"));
+			
 			String userId = getUserIdFromAuthorizer(input);
 			// LOG.info("userId: {}", userId);
 
@@ -79,13 +82,12 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 					break;			
 			}
 
-			Object data = service.handleRequest();
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("data", data);
+			Map<String, Object> response = service.handleRequest();
+			int statusCode = (int)response.get("statusCode");
+			response.remove("statusCode");
 
 			return ApiGatewayResponse.builder()
-					.setStatusCode(200)
+					.setStatusCode(statusCode)
 					.setObjectBody(response)
 					.setHeaders(Collections.singletonMap("X-Powered-By", "AWS Lambda & serverless"))
 					.build();
