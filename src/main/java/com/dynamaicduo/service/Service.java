@@ -16,27 +16,29 @@ abstract public class Service {
     protected String httpMethod;
     protected Map<String,String> pathParameters;
     protected Map<String,String> queryStringParameters;
-    protected JsonNode body;
+    protected String body;
 
     protected final Logger LOG = LogManager.getLogger(this.getClass());
 
+    protected Map<String, Object> responseData;
     protected Map<String, Object> result;
 
-    public Service(String userId, String path, String httpMethod, Map<String,String> pathParameters, Map<String,String> queryStringParameters, JsonNode body){
+    public Service(String userId, String path, String httpMethod, Map<String,String> pathParameters, Map<String,String> queryStringParameters, String body){
         this.userId = userId;
         this.path = path;
         this.httpMethod = httpMethod;
         this.pathParameters = pathParameters;
         this.queryStringParameters = queryStringParameters;
         this.body = body;
+        this.responseData = new HashMap<>();
         this.result = new HashMap<>();
     }
 
-    protected void constructResponse(int statusCode, String message, String error, Object data){
+    protected void constructResponse(int statusCode, String message, String error){
         this.result.put("statusCode", statusCode); 
         if(message != null) this.result.put("message", message);
         if(error != null) this.result.put("error", error);
-        if(data != null) this.result.put("data", data);
+        if(this.responseData.size() != 0) this.result.put("data", this.responseData);
     }
 
     protected void parseHttpMethod() {
