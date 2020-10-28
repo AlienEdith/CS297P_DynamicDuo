@@ -53,9 +53,9 @@ public class Patient {
         this.recordTime = recordTime;
     }
 
-    public void setAttributes(Map<String, Object> attributes){
-        this.attributes = attributes;
-    }
+    // public void setAttributes(Map<String, Object> attributes){
+    //     this.attributes = attributes;
+    // }
     // @DynamoDBAttribute(attributeName = "price")
     // public Float getPrice() {
     //     return this.price;

@@ -2,7 +2,7 @@ package com.dynamicduo.service;
 
 import com.dynamicduo.database.Patient;
 
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
