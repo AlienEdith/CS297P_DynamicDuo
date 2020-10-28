@@ -13,6 +13,27 @@ public class SymptomService extends Service{
     @Override
     protected void handleGetRequest(){
         LOG.info("handle in service: {}", "symptom");
+        if(pathParameters.containsKey("recordTime")){
+            // Get One Symptom
+
+        }else{
+            // Get Symptoms: condition and other requirements as query strings 
+            String condition = queryStringParameters.getOrDefault("conditions", "");
+            switch(condition){
+                case "":
+                    // Get All Symptoms
+                    break;
+                case "notcompleted":
+                    // Get Incomplete Symptoms
+                    break;
+                case "review":
+                    // Get Incomplete Symptoms
+                    break;
+                default:
+                    break;
+            }
+
+        }
     }
 
     @Override

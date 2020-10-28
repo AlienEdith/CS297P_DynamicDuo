@@ -63,7 +63,7 @@ functions:
   APIHandler:
     handler: com.dynamicduo.Handler
     events:
-      - http:
+      - http: # Get Patient
           path: /users
           method: get
           authorizer:
@@ -71,7 +71,7 @@ functions:
             authorizerId:
               Ref: CognitoAuthorizer
           cors: true
-      - http:
+      - http: # Create Patient
           path: /users
           method: post
           authorizer:
@@ -79,7 +79,7 @@ functions:
             authorizerId:
               Ref: CognitoAuthorizer
           cors: true
-      - http:
+      - http: # Delete Patient
           path: /users
           method: delete
           authorizer:
@@ -87,7 +87,7 @@ functions:
             authorizerId:
               Ref: CognitoAuthorizer
           cors: true
-      - http:
+      - http: # Update Patient
           path: /users
           method: put
           authorizer:
@@ -95,14 +95,54 @@ functions:
             authorizerId:
               Ref: CognitoAuthorizer
           cors: true
-      - http:
-          path: /symptoms/
+      - http: # Get One Symptom
+          path: /symptoms/{recordTime}
           method: get
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId:
               Ref: CognitoAuthorizer
+          cors: true
+      - http: # Create One Symptom
+          path: /symptoms/{recordTime}
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
           cors: true  
+      - http: # Delete One Symptom
+          path: /symptoms/{recordTime}
+          method: delete
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true  
+      - http: # Complete One Symptom
+          path: /symptoms/{recordTime}
+          method: put
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true
+      - http: # Update One Symptom
+          path: /symptoms/{recordTime}
+          method: put
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true 
+      - http: # Get Symptoms
+          path: /symptoms
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true    
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
