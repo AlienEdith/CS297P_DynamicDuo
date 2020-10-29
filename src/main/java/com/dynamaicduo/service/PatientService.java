@@ -2,14 +2,10 @@ package com.dynamicduo.service;
 
 import com.dynamicduo.database.Patient;
 
-<<<<<<< HEAD
-import java.util.*;
-=======
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
->>>>>>> c33cef8ff34e106d85e91010c179a8782166e881
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.gson.Gson;
