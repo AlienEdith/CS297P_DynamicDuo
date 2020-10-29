@@ -22,10 +22,6 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 
 	private static final Logger LOG = LogManager.getLogger(Handler.class);
 
-	// private static final String USER = "users";
-	// private static final String SYMPTOM = "symptoms";
-	// private static final String REPORT = "reports";
-
 	private Service service;
 
 	private String getUserIdFromAuthorizer(Map<String, Object> input){
@@ -41,7 +37,6 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 
 	private String getService(String path){
 		String[] pathArray = path.split("/");
-		// for(String s : pathArray)	LOG.info("path: {}", s);
 		return pathArray[1];
 	}
 
@@ -57,8 +52,8 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 			LOG.info("pathParameters: {}", pathParameters);
 			Map<String,String> queryStringParameters =  (Map<String,String>)input.get("queryStringParameters");
 			LOG.info("queryStringParameters: {}", queryStringParameters);
-			// JsonNode body = new ObjectMapper().readTree((String) input.get("body"));
-			JsonNode body = null;
+			String body = (String) input.get("body");
+			
 			String userId = getUserIdFromAuthorizer(input);
 			// LOG.info("userId: {}", userId);
 
@@ -66,7 +61,6 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 			String serviceType = getService(path);
 			switch(serviceType){
 				case "users":
-					LOG.info("user service - userId: {}", userId);
 					service = new PatientService(userId, path, httpMethod, pathParameters, queryStringParameters, body);
 					break;
 				case "symptoms":
@@ -79,13 +73,12 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 					break;			
 			}
 
-			Object data = service.handleRequest();
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("data", data);
+			Map<String, Object> response = service.handleRequest();
+			int statusCode = (int)response.get("statusCode");
+			response.remove("statusCode");
 
 			return ApiGatewayResponse.builder()
-					.setStatusCode(200)
+					.setStatusCode(statusCode)
 					.setObjectBody(response)
 					.setHeaders(Collections.singletonMap("X-Powered-By", "AWS Lambda & serverless"))
 					.build();

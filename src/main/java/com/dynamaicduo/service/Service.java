@@ -3,6 +3,7 @@ package com.dynamicduo.service;
 // import com.dynamicduo.utils.HttpMethod;
 
 import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,19 +16,29 @@ abstract public class Service {
     protected String httpMethod;
     protected Map<String,String> pathParameters;
     protected Map<String,String> queryStringParameters;
-    protected JsonNode body;
+    protected String body;
 
     protected final Logger LOG = LogManager.getLogger(this.getClass());
 
-    protected Object result = null;
+    protected Map<String, Object> responseData;
+    protected Map<String, Object> result;
 
-    public Service(String userId, String path, String httpMethod, Map<String,String> pathParameters, Map<String,String> queryStringParameters, JsonNode body){
+    public Service(String userId, String path, String httpMethod, Map<String,String> pathParameters, Map<String,String> queryStringParameters, String body){
         this.userId = userId;
         this.path = path;
         this.httpMethod = httpMethod;
         this.pathParameters = pathParameters;
         this.queryStringParameters = queryStringParameters;
         this.body = body;
+        this.responseData = new HashMap<>();
+        this.result = new HashMap<>();
+    }
+
+    protected void constructResponse(int statusCode, String message, String error){
+        this.result.put("statusCode", statusCode); 
+        if(message != null) this.result.put("message", message);
+        if(error != null) this.result.put("error", error);
+        if(this.responseData.size() != 0) this.result.put("data", this.responseData);
     }
 
     protected void parseHttpMethod() {
@@ -58,7 +69,7 @@ abstract public class Service {
     protected abstract void handlePatchRequest();
     protected abstract void handleDeleteRequest();
     
-    public Object handleRequest(){
+    public Map<String, Object> handleRequest(){
         parseHttpMethod();
 
         return result;

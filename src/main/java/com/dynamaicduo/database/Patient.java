@@ -22,7 +22,7 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@DynamoDBTable(tableName = "PLACEHOLDER_PATIENT_TABLE_NAME")
+@DynamoDBTable(tableName = "PLACEHOLDER")
 public class Patient {
 
     private static final String PATIENT_TABLE_NAME = System.getenv("PATIENT_TABLE");
@@ -32,37 +32,58 @@ public class Patient {
     private final DynamoDBMapper mapper;
 
     private final Logger LOG = LogManager.getLogger(this.getClass());
-    // private Logger logger = Logger.getLogger(this.getClass());
 
     private String userId;
     private String recordTime;
+    private String email;
+    private String username;
+    private String dateOfBirth;
+    private String gender;
+    private String image;
 
+    private List<String> latestFourSymptoms;    
+    private List<String> chronicCondition;
+    private List<Map<String, String>> emergencyContact;
+    
     @DynamoDBHashKey(attributeName = "userId")
-    public String getUserId() {
-        return this.userId;
-    }
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    public String getUserId() { return this.userId; }
+    public void setUserId(String userId) { this.userId = userId; }
 
     @DynamoDBRangeKey(attributeName = "recordTime")
-    public String getRecordTime() {
-        return this.recordTime;
-    }
-    public void setRecordTime(String recordTime) {
-        this.recordTime = recordTime;
-    }
+    public String getRecordTime() { return this.recordTime; }
+    public void setRecordTime(String recordTime) { this.recordTime = recordTime; }
 
-    // public void setAttributes(Map<String, Object> attributes){
-    //     this.attributes = attributes;
-    // }
-    // @DynamoDBAttribute(attributeName = "price")
-    // public Float getPrice() {
-    //     return this.price;
-    // }
-    // public void setPrice(Float price) {
-    //     this.price = price;
-    // }
+    @DynamoDBAttribute(attributeName = "email")
+    public String getEmail() { return this.email; }
+    public void setEmail(String email) { this.email = email; }
+
+    @DynamoDBAttribute(attributeName = "username")
+    public String getUsername() { return this.username; }
+    public void setUsername(String username) { this.username = username; }
+
+    @DynamoDBAttribute(attributeName = "dateOfBirth")
+    public String getDateOfBirth() { return this.dateOfBirth; }
+    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+
+    @DynamoDBAttribute(attributeName = "gender")
+    public String getGender() { return this.gender; }
+    public void setGender(String gender) { this.gender = gender; }
+
+    @DynamoDBAttribute(attributeName = "image")
+    public String getImage() { return this.image; }
+    public void setImage(String image) { this.image = image; }
+
+    @DynamoDBAttribute(attributeName = "latestFourSymptoms")
+    public List<String> getLatestFourSymptoms() { return this.latestFourSymptoms; }
+    public void setLatestFourSymptoms(List<String> latestFourSymptoms) { this.latestFourSymptoms = latestFourSymptoms; }
+
+    @DynamoDBAttribute(attributeName = "chronicCondition")
+    public List<String> getChronicCondition() { return this.chronicCondition; }
+    public void setChronicCondition(List<String> chronicCondition) { this.chronicCondition = chronicCondition; }
+
+    @DynamoDBAttribute(attributeName = "emergencyContact")
+    public List<Map<String, String>> getEmergencyContact() { return this.emergencyContact; }
+    public void setEmergencyContact(List<Map<String, String>> emergencyContact) { this.emergencyContact = emergencyContact; }
 
     public Patient() {
         DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
@@ -99,29 +120,31 @@ public class Patient {
         return patient;
     }
 
-    public void save() throws IOException {
-        Map<String,AttributeValue> attributeValue = new HashMap<String,AttributeValue>();
-        attributeValue.put("userId", new AttributeValue().withS("2"));
-        attributeValue.put("recordTime", new AttributeValue().withS("what"));
-        client.putItem(PATIENT_TABLE_NAME, attributeValue);
-        
+    public Patient save() throws IOException {
+        this.mapper.save(this);
+        return get(this.userId);
     }
 
-    // public List<>
+    public Patient update() throws IOException {
+        return save();
+    }
 
-    // public Boolean delete(String userId) throws IOException {
-    //     Patient patient = null;
+    public Boolean delete(String userId) throws IOException {
 
-    //     // get product if exists
-    //     patient = get(id);
-    //     if (product != userId) {
-    //       logger.info("Products - delete(): " + product.toString());
-    //       this.mapper.delete(product);
-    //     } else {
-    //       logger.info("Products - delete(): product - does not exist.");
-    //       return false;
-    //     }
-    //     return true;
-    // }
+        HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
+        attributeValue.put(":userId", new AttributeValue().withS(userId));
+
+        DynamoDBQueryExpression<Patient> queryExp = new DynamoDBQueryExpression<Patient>()
+            .withKeyConditionExpression("userId = :userId")
+            .withExpressionAttributeValues(attributeValue);
+
+        PaginatedQueryList<Patient> patients = this.mapper.query(Patient.class, queryExp);
+        
+        if(patients.size() == 0)    return false;
+
+        this.mapper.batchDelete(patients);
+        
+        return true;
+    }
 
 }
