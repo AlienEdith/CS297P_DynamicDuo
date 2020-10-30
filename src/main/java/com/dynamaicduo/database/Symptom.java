@@ -77,7 +77,7 @@ public class Symptom {
     public boolean delete(String userId, String recordTime) throws IOException {
         HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
         attributeValue.put(":userId", new AttributeValue().withS(userId));
-        attributeValue.put(":recordTime", new AttributeValue.withS(recordTime));
+        attributeValue.put(":recordTime", new AttributeValue().withS(recordTime));
         DynamoDBQueryExpression<Symptom> queryExp = new DynamoDBQueryExpression<Patient>()
             .withKeyConditionExpression("userId = :userId")
             .withExpressionAttributeValues(attributeValue);
