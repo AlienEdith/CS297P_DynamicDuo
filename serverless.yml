@@ -104,7 +104,7 @@ functions:
               Ref: CognitoAuthorizer
           cors: true
       - http: # Create One Symptom
-          path: /symptoms/{recordTime}
+          path: /symptoms/
           method: post
           authorizer:
             type: COGNITO_USER_POOLS
