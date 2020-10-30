@@ -129,7 +129,7 @@ functions:
           cors: true
       - http: # Update One Symptom
           path: /symptoms/{recordTime}
-          method: put
+          method: patch
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId:
@@ -138,6 +138,38 @@ functions:
       - http: # Get Symptoms
           path: /symptoms
           method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true
+      - http: # Get One Report
+          path: /reports/{recordTime}
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true
+      - http: # Get All Report
+          path: /reports
+          method: get
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true
+      - http: # Create One Report
+          path: /reports
+          method: post
+          authorizer:
+            type: COGNITO_USER_POOLS
+            authorizerId:
+              Ref: CognitoAuthorizer
+          cors: true  
+      - http: # Delete One Report
+          path: /reports/{recordTime}
+          method: delete
           authorizer:
             type: COGNITO_USER_POOLS
             authorizerId:

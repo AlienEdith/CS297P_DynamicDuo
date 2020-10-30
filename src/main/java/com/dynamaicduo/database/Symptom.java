@@ -69,8 +69,8 @@ public class Symptom {
             .withKeyConditionExpression("userId = :userId and recordTime = :recordTime")
             .withExpressionAttributeValues(attributeValue);
 
-        PaginatedQueryList<Symptom> result = this.mapper.query(Patient.class, queryExp);
-        if (result.size() > 0) patient = result.get(0);
+        PaginatedQueryList<Symptom> result = this.mapper.query(Symptom.class, queryExp);
+        if (result.size() > 0) symptom = result.get(0);
 
         return symptom;
     }
@@ -78,7 +78,7 @@ public class Symptom {
         HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
         attributeValue.put(":userId", new AttributeValue().withS(userId));
         attributeValue.put(":recordTime", new AttributeValue().withS(recordTime));
-        DynamoDBQueryExpression<Symptom> queryExp = new DynamoDBQueryExpression<Patient>()
+        DynamoDBQueryExpression<Symptom> queryExp = new DynamoDBQueryExpression<Symptom>()
             .withKeyConditionExpression("userId = :userId")
             .withExpressionAttributeValues(attributeValue);
 
@@ -87,6 +87,8 @@ public class Symptom {
         if(symptoms.size() == 0)    return false;
 
         this.mapper.batchDelete(symptoms);
+
+        return true;
     }
 
 }
