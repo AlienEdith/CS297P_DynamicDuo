@@ -15,6 +15,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.io.IOException;
+import java.text.Attribute;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -58,35 +59,36 @@ public class Symptom {
         return String.format("Symptom [id=%s]", this.userId);
     }
 
-    public Symptom get(String userId, String recordTime) throws IOException {
-        Symptom symptom = null;
+    public boolean createSymptom(String userId, HashMap<String, AttributeValue> attributes) throws IOException {
+        // Symptom symptom = null;
 
-        HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
-        attributeValue.put(":userId", new AttributeValue().withS(userId));
-        attributeValue.put(":recordTime", new AttributeValue().withS(recordTime));
+        // HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
+        // attributeValue.put(":userId", new AttributeValue().withS(userId));
+        // attributeValue.put(":recordTime", new AttributeValue().withS(recordTime));
 
-        DynamoDBQueryExpression<Symptom> queryExp = new DynamoDBQueryExpression<Symptom>()
-            .withKeyConditionExpression("userId = :userId and recordTime = :recordTime")
-            .withExpressionAttributeValues(attributeValue);
+        // DynamoDBQueryExpression<Symptom> queryExp = new DynamoDBQueryExpression<Symptom>()
+        //     .withKeyConditionExpression("userId = :userId and recordTime = :recordTime")
+        //     .withExpressionAttributeValues(attributeValue);
 
-        PaginatedQueryList<Symptom> result = this.mapper.query(Patient.class, queryExp);
-        if (result.size() > 0) patient = result.get(0);
-
-        return symptom;
+        // PaginatedQueryList<Symptom> result = this.mapper.query(Symptom.class, queryExp);
+        // if (result.size() > 0) symptom = result.get(0);
+        
+        //TODO
+        Symptom symptom = new Symptom();
+        this.mapper.save(symptom);
+        return true;
     }
     public boolean delete(String userId, String recordTime) throws IOException {
-        HashMap<String, AttributeValue> attributeValue = new HashMap<String, AttributeValue>();
-        attributeValue.put(":userId", new AttributeValue().withS(userId));
-        attributeValue.put(":recordTime", new AttributeValue().withS(recordTime));
-        DynamoDBQueryExpression<Symptom> queryExp = new DynamoDBQueryExpression<Patient>()
-            .withKeyConditionExpression("userId = :userId")
-            .withExpressionAttributeValues(attributeValue);
+        Symptom symptom = this.mapper.load(Symptom.class, userId, recordTime);
+        this.mapper.delete(symptom);
 
-        PaginatedQueryList<Symptom> symptoms = this.mapper.query(Symptom.class, queryExp);
-        
-        if(symptoms.size() == 0)    return false;
+        return true;
+    }
+    public boolean completeSymptom(String userId, String recordTime, HashMap<String, AttributeValue> params) {
+        Symptom symptom = this.mapper.load(Symptom.class, userId, recordTime);
+        //TODO
+        return true;
 
-        this.mapper.batchDelete(symptoms);
     }
 
 }

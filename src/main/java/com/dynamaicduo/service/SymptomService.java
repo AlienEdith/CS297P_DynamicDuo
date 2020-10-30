@@ -13,7 +13,7 @@ public class SymptomService extends Service{
     @Override
     protected void handleGetRequest(){
         LOG.info("handle in service: {}", "symptom");
-        if(pathParameters.containsKey("recordTime")){
+        if(pathParameters != null &&  pathParameters.containsKey("recordTime")){
             // Get One Symptom
 
         }else{
