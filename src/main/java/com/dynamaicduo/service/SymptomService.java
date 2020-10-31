@@ -1,8 +1,13 @@
 package com.dynamicduo.service;
 
 import java.util.Map;
+import com.dynamicduo.database.Symptom;
+
+import java.util.Date;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import com.google.gson.Gson;
 
 public class SymptomService extends Service{
 
@@ -38,6 +43,25 @@ public class SymptomService extends Service{
 
     @Override
     protected void handlePostRequest(){
+        // create symptom
+        String recordTime = "SYMPTOM" + pathParameters.getOrDefault("recordTime", String.valueOf(new Date().getTime()));
+        String completionTime = pathParameters.getOrDefault("completionTime", String.valueOf(Integer.parseInt(recordTime) + 43200));
+        try{
+
+            Gson gson = new Gson();
+            Symptom symptom = gson.fromJson(this.body, Symptom.class);
+            symptom.setRecordTime(recordTime);
+            symptom.setCompletionTime(completionTime);
+            Symptom returnedSymptom = symptom.save();
+
+            if(returnedSymptom != null){
+                responseData.put("symptom", returnedSymptom);
+                constructResponse(200, "Create Symptom Successfully", null);
+            }else   constructResponse(401, null, "Create Symptom Failed");
+
+        }catch (Exception ex){
+            LOG.error("error: {}", ex);
+        }
 
     }
 

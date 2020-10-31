@@ -51,6 +51,7 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 			Map<String,String> pathParameters =  (Map<String,String>)input.get("pathParameters");
 			LOG.info("pathParameters: {}", pathParameters);
 			Map<String,String> queryStringParameters =  (Map<String,String>)input.get("queryStringParameters");
+			
 			LOG.info("queryStringParameters: {}", queryStringParameters);
 			String body = (String) input.get("body");
 			
@@ -59,6 +60,7 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 
 			// Parse the path 
 			String serviceType = getService(path);
+			LOG.info("serviceType: {}" + serviceType);
 			switch(serviceType){
 				case "users":
 					service = new PatientService(userId, path, httpMethod, pathParameters, queryStringParameters, body);

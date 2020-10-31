@@ -15,7 +15,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 
 import java.io.IOException;
-import java.text.Attribute;
+// import java.text.Attribute;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +49,7 @@ public class Symptom {
     private String symptomMovement;
     private String frequency;
     private String symptomConsistency;
-    private Integer severity;
+    private String severity;
     private String symptomDescription;
     private String previousItemId;
     private String completionTime;
@@ -61,9 +61,9 @@ public class Symptom {
     public String getRecordTime() { return this.recordTime; }
     public void setRecordTime(String recordTime) { this.recordTime = recordTime; }
 
-    @DynamoDBAttribute(attributeName = "symptomId")
-    public String getSymptomId() { return this.symptomId; }
-    public void setSymptomId(String symptomId) { this.symptomId = symptomId; }
+    // @DynamoDBAttribute(attributeName = "symptomId")
+    // public String getSymptomId() { return this.symptomId; }
+    // public void setSymptomId(String symptomId) { this.symptomId = symptomId; }
 
     @DynamoDBAttribute(attributeName = "symptomName")
     public String getSymptomName() { return this.symptomName; }
@@ -95,15 +95,15 @@ public class Symptom {
     
     @DynamoDBAttribute(attributeName = "severity")
     public String getSeverity() { return this.severity; }
-    public void setSeverity(Integer severity) { this.severity = severity; }
+    public void setSeverity(String severity) { this.severity = severity; }
     
     @DynamoDBAttribute(attributeName = "symptomDescription")
     public String getSymptomDescription() { return this.symptomDescription; }
     public void setSymptomDescription(String symptomDescription) { this.symptomDescription = symptomDescription; }
 
-    @DynamoDBAttribute(attributeName = "previousItemId")
-    public String getPreviousItemId() { return this.previousItemId; }
-    public void setPreviousItemId(String previousItemId) { this.previousItemId = previousItemId; }
+    // @DynamoDBAttribute(attributeName = "previousItemId")
+    // public String getPreviousItemId() { return this.previousItemId; }
+    // public void setPreviousItemId(String previousItemId) { this.previousItemId = previousItemId; }
 
     @DynamoDBAttribute(attributeName = "completionTime")
     public String getCompletionTime() { return this.completionTime; }
@@ -122,54 +122,44 @@ public class Symptom {
         return String.format("Symptom [id=%s]", this.userId);
     }
 
-    public boolean createSymptom(String userId, HashMap<String, String> attributes) throws IOException {
-        Symptom symptom = new Symptom();
-        String recordTime = attributes.getOrDefault("recordTime", String.valueOf(new Date().getTime()));
-        String completionTime = attributes.getOrDefault("completionTime", String.valueOf(Integer.parseInt(recordTime) + 43200));
-        symptom.setUserId(userId);
-        symptom.setRecordTime(recordTime);
-        symptom.setSymptomId(attributes.getOrDefault("symptomId", "undecided"));
-        symptom.setStartDate(attributes.getOrDefault("startDate", ""));
-        symptom.setSymptomLocation(attributes.getOrDefault("symptomLocation", ""));
-        symptom.setSymptomLocationDescription(attributes.getOrDefault("symptomLocationDescription", ""));
-        symptom.setSymptomMovement(attributes.getOrDefault("symptomMovement", ""));
-        symptom.setFrequency(attributes.getOrDefault("frequency", ""));
-        symptom.setSymptomConsistency(attributes.getOrDefault("symptomConsistency", ""));
-        symptom.setSeverity(Integer.parseInt(getOrDefault("severity", 0)));
-        symptom.setSymptomDescription(attributes.getOrDefault("symptomDescription", ""));
-        symptom.setPreviousItemId(attributes.getOrDefault("previousItemId", "0"));
-        symptom.setCompletionTime(attributes.getOrDefault("completionTime", completionTime));
-        this.mapper.save(symptom);
-        return true;
+    public Symptom save() throws IOException {
+        this.mapper.save(this);
+        return get(this.userId, this.recordTime);
+    }
+    public Symptom get(String userId, String recordTime) throws IOException {
+        return this.mapper.load(Symptom.class, userId, recordTime);
     }
     public boolean delete(String userId, String recordTime) throws IOException {
-        Symptom symptom = this.mapper.load(Symptom.class, userId, recordTime);
+        Symptom symptom = get(userId, recordTime);
         this.mapper.delete(symptom);
 
         return true;
     }
-    public boolean completeSymptom(String userId, String recordTime, HashMap<String, AttributeValue> params) throws IOException{
-        Symptom symptom = this.mapper.load(Symptom.class, userId, recordTime);
+    // public boolean completeSymptom(String userId, String recordTime, HashMap<String, AttributeValue> params) throws IOException{
+    //     Symptom symptom = getOneSymptom(userId, recordTime);
+    //     //TODO
+    //     return true;
+
+    // }
+    
+    public Symptom update() throws IOException{
         //TODO
-        return true;
-
+        return save();
     }
-
-    public boolean updateSymptom(String userId, String recordTime ) throws IOException{
-        //TODO
-        return true;
-    }
-
-    public List<Symptom> getSymptom(String userId, String lastDays, String resovledState) throws IOException{
+    // public Symptom getOneSymptom(String userId, String recordTime) throws IOException{
+    //     return this.mapper.load(Symptom.class, userId, recordTime);
+    // }
+    public PaginatedQueryList<Symptom> getSymptoms(String userId, String lastDays, String resovledState) throws IOException{
         Long curDayEpoch = new Date().getTime();
         Long startDayEpoch = lastDays.equals("") ? 1L : curDayEpoch - 86400 * Integer.parseInt(lastDays);
-        Map<String, AttributeValue> queryMap = new HashMap<String, AttributeValue>();
-        queryExp.put(":uId", new AttributeValue().withS(userId));
-        queryExp.put(":rT", new AttributeValue().withS("SYMPTOM" + startDayEpoch.toString()));
+        HashMap<String, AttributeValue> attributes = new HashMap<String, AttributeValue>();
+        attributes.put(":uId", new AttributeValue().withS(userId));
+        attributes.put(":rT", new AttributeValue().withS("SYMPTOM" + startDayEpoch.toString()));
         DynamoDBQueryExpression<Symptom> queryExpression = new DynamoDBQueryExpression<Symptom>()
-        .withKeyConditionExpression("userId = :uId and recordTime > :rT").withExpressionAttributeValues(queryExp);
+        .withKeyConditionExpression("userId = :uId and recordTime > :rT").withExpressionAttributeValues(attributes);
 
-        List<Symptom> latestReplies = mapper.query(Reply.class, queryExpression);
+        PaginatedQueryList<Symptom> symptoms = this.mapper.query(Symptom.class, queryExpression);
+        return symptoms;
     }
 
 }
