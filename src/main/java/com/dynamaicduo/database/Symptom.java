@@ -143,7 +143,6 @@ public class Symptom {
     // }
     
     public Symptom update() throws IOException{
-        //TODO
         return save();
     }
     // public Symptom getOneSymptom(String userId, String recordTime) throws IOException{

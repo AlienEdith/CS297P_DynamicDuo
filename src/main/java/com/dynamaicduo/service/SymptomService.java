@@ -27,6 +27,7 @@ public class SymptomService extends Service{
             switch(condition){
                 case "":
                     // Get All Symptoms
+                    
                     break;
                 case "notcompleted":
                     // Get Incomplete Symptoms
@@ -67,7 +68,30 @@ public class SymptomService extends Service{
 
     @Override
     protected void handlePutRequest(){
+        try{
+            String recordTime = pathParameters.get("recordTime");
+            Symptom currSymptom = new currSymptom().get(this.userId, "SYMPTOM" + recordTime);
 
+            if(currSymptom == null){
+                constructResponse(404, null, "Symptom Not Found");
+            }else{
+                Gson gson = new Gson();
+                Symptom newSymptom = gson.fromJson(this.body, Symptom.class);
+                newSymptom.setUserId(this.userId);
+                newSymptom.setRecordTime(recordTime);
+
+                Patient returnedSymptom = newSymptom.update();
+
+                if(returnedSymptom != null){
+                    responseData.put("symptom", returnedPatient);
+                    constructResponse(200, "Update Symptom Successfully", null);
+                }else   constructResponse(401, null, "Update Symptom Failed");
+            }
+
+
+        }catch (Exception ex){
+            LOG.error("error: {}", ex);
+        }
     }
 
     @Override
