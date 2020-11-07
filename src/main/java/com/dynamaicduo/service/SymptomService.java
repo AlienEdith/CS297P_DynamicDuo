@@ -2,6 +2,7 @@ package com.dynamicduo.service;
 
 import java.util.Map;
 import com.dynamicduo.database.Symptom;
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 
 import java.util.Date;
 
@@ -27,7 +28,19 @@ public class SymptomService extends Service{
             switch(condition){
                 case "":
                     // Get All Symptoms
-                    
+                    String lastDays = queryStringParameters.getOrDefault("lastDays","");
+                    String reslovedState = queryStringParameters.getOrDefault("resolvedState","");
+                    String sortBy = queryStringParameters.getOrDefault("sortBy","");
+                    try {
+                        Symptom symptom = new Symptom();
+                        PaginatedQueryList<Symptom> symptoms = symptom.getSymptoms(userId, lastDays, reslovedState, sortBy);
+                        if(symptoms != null){
+                            responseData.put("symptoms", symptoms);
+                            constructResponse(200, "Get Symptoms Successfully", null);
+                        }else   constructResponse(401, null, "Get Symptoms Failed");
+                    }catch(Exception ex) {
+                        LOG.error("error: {}", ex);
+                    }
                     break;
                 case "notcompleted":
                     // Get Incomplete Symptoms
@@ -44,15 +57,23 @@ public class SymptomService extends Service{
 
     @Override
     protected void handlePostRequest(){
-        // create symptom
-        String recordTime = "SYMPTOM" + pathParameters.getOrDefault("recordTime", String.valueOf(new Date().getTime()));
-        String completionTime = pathParameters.getOrDefault("completionTime", String.valueOf(Integer.parseInt(recordTime) + 43200));
+       
+        // LOG.info("recordTime: {}" + recordTime);
         try{
 
             Gson gson = new Gson();
             Symptom symptom = gson.fromJson(this.body, Symptom.class);
+             // create symptom
+            String recordTime;
+            String completionTime;
+            recordTime = "SYMPTOM#" + (symptom.getRecordTime().equals("") ?  String.valueOf(new Date().getTime()) : symptom.getRecordTime());
+            completionTime = symptom.getCompletionTime().equals("") ? String.valueOf(Integer.parseInt(recordTime) + 43200) : symptom.getCompletionTime();
             symptom.setRecordTime(recordTime);
             symptom.setCompletionTime(completionTime);
+            symptom.setUserId(userId);
+            LOG.info("symptom: {}" + symptom.toString());
+
+            // LOG.info("symptom: " + symptom.toString());
             Symptom returnedSymptom = symptom.save();
 
             if(returnedSymptom != null){
@@ -70,7 +91,7 @@ public class SymptomService extends Service{
     protected void handlePutRequest(){
         try{
             String recordTime = pathParameters.get("recordTime");
-            Symptom currSymptom = new currSymptom().get(this.userId, "SYMPTOM" + recordTime);
+            Symptom currSymptom = new Symptom().get(this.userId, "SYMPTOM#" + recordTime);
 
             if(currSymptom == null){
                 constructResponse(404, null, "Symptom Not Found");
@@ -78,12 +99,12 @@ public class SymptomService extends Service{
                 Gson gson = new Gson();
                 Symptom newSymptom = gson.fromJson(this.body, Symptom.class);
                 newSymptom.setUserId(this.userId);
-                newSymptom.setRecordTime(recordTime);
+                newSymptom.setRecordTime("SYMPTOM#" + recordTime);
 
-                Patient returnedSymptom = newSymptom.update();
+                Symptom returnedSymptom = newSymptom.update();
 
                 if(returnedSymptom != null){
-                    responseData.put("symptom", returnedPatient);
+                    responseData.put("symptom", returnedSymptom);
                     constructResponse(200, "Update Symptom Successfully", null);
                 }else   constructResponse(401, null, "Update Symptom Failed");
             }
@@ -101,6 +122,21 @@ public class SymptomService extends Service{
 
     @Override
     protected void handleDeleteRequest(){
+        try{
+            String recordTime = pathParameters.get("recordTime");
+            Boolean deleted = new Symptom().delete(this.userId, "SYMPTOM#" + recordTime);
 
+            if(!deleted){
+                constructResponse(404, null, "Symptom Not Found");
+            }else{
+                responseData.put("recordTime", recordTime);
+                constructResponse(200, "Delete Symptom Successfully", null);
+               
+            }
+
+
+        }catch (Exception ex){
+            LOG.error("error: {}", ex);
+        }
     }
 }

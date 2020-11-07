@@ -44,7 +44,7 @@ public class PatientService extends Service{
             patient.setLatestFourSymptoms(new ArrayList<>());
 
             Patient returnedPatient = patient.save();
-
+            LOG.info("returnedPatient: {}", returnedPatient);
             if(returnedPatient != null){
                 responseData.put("patient", returnedPatient);
                 constructResponse(200, "Create Patient Successfully", null);

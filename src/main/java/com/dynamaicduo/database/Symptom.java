@@ -53,6 +53,13 @@ public class Symptom {
     private String symptomDescription;
     private String previousItemId;
     private String completionTime;
+    private String reviewTime;
+    private String resolvedDate;
+    private String betterCondition;
+    private String worseCondition;
+    private String impactToLife;
+    private String otherRelatedSymptom;
+
     @DynamoDBHashKey(attributeName = "userId")
     public String getUserId() { return this.userId; }
     public void setUserId(String userId) { this.userId = userId; }
@@ -61,9 +68,9 @@ public class Symptom {
     public String getRecordTime() { return this.recordTime; }
     public void setRecordTime(String recordTime) { this.recordTime = recordTime; }
 
-    // @DynamoDBAttribute(attributeName = "symptomId")
-    // public String getSymptomId() { return this.symptomId; }
-    // public void setSymptomId(String symptomId) { this.symptomId = symptomId; }
+    @DynamoDBAttribute(attributeName = "symptomId")
+    public String getSymptomId() { return this.symptomId; }
+    public void setSymptomId(String symptomId) { this.symptomId = symptomId; }
 
     @DynamoDBAttribute(attributeName = "symptomName")
     public String getSymptomName() { return this.symptomName; }
@@ -101,14 +108,40 @@ public class Symptom {
     public String getSymptomDescription() { return this.symptomDescription; }
     public void setSymptomDescription(String symptomDescription) { this.symptomDescription = symptomDescription; }
 
-    // @DynamoDBAttribute(attributeName = "previousItemId")
-    // public String getPreviousItemId() { return this.previousItemId; }
-    // public void setPreviousItemId(String previousItemId) { this.previousItemId = previousItemId; }
+    @DynamoDBAttribute(attributeName = "previousItemId")
+    public String getPreviousItemId() { return this.previousItemId; }
+    public void setPreviousItemId(String previousItemId) { this.previousItemId = previousItemId; }
 
     @DynamoDBAttribute(attributeName = "completionTime")
     public String getCompletionTime() { return this.completionTime; }
     public void setCompletionTime(String completionTime) { this.completionTime = completionTime; }
+
+    @DynamoDBAttribute(attributeName = "reviewTime")
+    public String getReviewTime() { return this.reviewTime; }
+    public void setReviewTime(String reviewTime) { this.reviewTime = reviewTime; }
     
+    @DynamoDBAttribute(attributeName = "resolvedDate")
+    public String getResolvedDate() { return this.resolvedDate; }
+    public void setResolvedDate(String resolvedDate) { this.resolvedDate = resolvedDate; }
+
+    @DynamoDBAttribute(attributeName = "betterCondition")
+    public String getBetterCondition() { return this.betterCondition; }
+    public void setBetterCondition(String betterCondition) { this.betterCondition = betterCondition; }
+
+    @DynamoDBAttribute(attributeName = "worseCondition")
+    public String getWorseCondition() { return this.worseCondition; }
+    public void setWorseCondition(String worseCondition) { this.worseCondition = worseCondition; }
+
+    @DynamoDBAttribute(attributeName = "impactToLife")
+    public String getImpactToLife() { return this.impactToLife; }
+    public void setImpactToLife(String impactToLife) { this.impactToLife = impactToLife; }
+
+    @DynamoDBAttribute(attributeName = "otherRelatedSymptom")
+    public String getOtherRelatedSymptom() { return this.otherRelatedSymptom; }
+    public void setOtherRelatedSymptom(String otherRelatedSymptom) { this.otherRelatedSymptom = otherRelatedSymptom; }
+
+
+
     public Symptom() {
         DynamoDBMapperConfig mapperConfig = DynamoDBMapperConfig.builder()
             .withTableNameOverride(new DynamoDBMapperConfig.TableNameOverride(PATIENT_TABLE_NAME))
@@ -148,7 +181,7 @@ public class Symptom {
     // public Symptom getOneSymptom(String userId, String recordTime) throws IOException{
     //     return this.mapper.load(Symptom.class, userId, recordTime);
     // }
-    public PaginatedQueryList<Symptom> getSymptoms(String userId, String lastDays, String resovledState) throws IOException{
+    public PaginatedQueryList<Symptom> getSymptoms(String userId, String lastDays, String resovledState, String sortBy) throws IOException{
         Long curDayEpoch = new Date().getTime();
         Long startDayEpoch = lastDays.equals("") ? 1L : curDayEpoch - 86400 * Integer.parseInt(lastDays);
         HashMap<String, AttributeValue> attributes = new HashMap<String, AttributeValue>();
