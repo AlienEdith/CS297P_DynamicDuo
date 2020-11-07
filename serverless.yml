@@ -96,7 +96,7 @@ functions:
               Ref: CognitoAuthorizer
           cors: true
       - http: # Get One Symptom
-          path: /symptoms/{recordTime}
+          path: /symptom/{recordTime}
           method: get
           authorizer:
             type: COGNITO_USER_POOLS
@@ -112,7 +112,7 @@ functions:
               Ref: CognitoAuthorizer
           cors: true  
       - http: # Delete One Symptom
-          path: /symptoms/{recordTime}
+          path: /symptom/{recordTime}
           method: delete
           authorizer:
             type: COGNITO_USER_POOLS
@@ -120,7 +120,7 @@ functions:
               Ref: CognitoAuthorizer
           cors: true  
       - http: # Complete One Symptom
-          path: /symptoms/{recordTime}
+          path: /symptom/{recordTime}
           method: put
           authorizer:
             type: COGNITO_USER_POOLS
@@ -128,7 +128,7 @@ functions:
               Ref: CognitoAuthorizer
           cors: true
       - http: # Update One Symptom
-          path: /symptoms/{recordTime}
+          path: /symptom/{recordTime}
           method: patch
           authorizer:
             type: COGNITO_USER_POOLS
@@ -136,7 +136,7 @@ functions:
               Ref: CognitoAuthorizer
           cors: true 
       - http: # Get Symptoms
-          path: /symptoms
+          path: /symptoms/{condition}
           method: get
           authorizer:
             type: COGNITO_USER_POOLS

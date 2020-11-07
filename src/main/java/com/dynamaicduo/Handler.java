@@ -67,7 +67,10 @@ public class Handler implements RequestHandler<Map<String, Object>, ApiGatewayRe
 					break;
 				case "symptoms":
 					service = new SymptomService(userId, path, httpMethod, pathParameters, queryStringParameters, body);
-					break;				
+					break;	
+				case "symptom":
+					service = new SymptomService(userId, path, httpMethod, pathParameters, queryStringParameters, body);
+					break;			
 				case "reports":
 					service = new ReportService(userId, path, httpMethod, pathParameters, queryStringParameters, body);
 					break;

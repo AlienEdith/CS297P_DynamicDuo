@@ -21,19 +21,30 @@ public class SymptomService extends Service{
         LOG.info("handle in service: {}", "symptom");
         if(pathParameters != null &&  pathParameters.containsKey("recordTime")){
             // Get One Symptom
-
+            String recordTime = pathParameters.get("recordTime");
+            LOG.info("recordTime: {}" + recordTime);
+            try{
+                Symptom symptom = new Symptom().getOneSymptom(userId, "SYMPTOM#" + recordTime);
+                if(symptom != null){
+                    responseData.put("symptom", symptom);
+                    constructResponse(200, "Get Symptom Successfully", null);
+                }else   constructResponse(401, null, "Get Symptom Failed");
+            }catch(Exception ex) {
+                LOG.error("error: {}" + ex);
+            }
         }else{
             // Get Symptoms: condition and other requirements as query strings 
-            String condition = queryStringParameters.getOrDefault("conditions", "");
+            String condition = pathParameters.getOrDefault("condition", "");
+            LOG.info("condtion:{}" + condition);
             switch(condition){
                 case "":
                     // Get All Symptoms
                     String lastDays = queryStringParameters.getOrDefault("lastDays","");
-                    String reslovedState = queryStringParameters.getOrDefault("resolvedState","");
+                    String resolvedState = queryStringParameters.getOrDefault("resolvedState","");
                     String sortBy = queryStringParameters.getOrDefault("sortBy","");
                     try {
                         Symptom symptom = new Symptom();
-                        PaginatedQueryList<Symptom> symptoms = symptom.getSymptoms(userId, lastDays, reslovedState, sortBy);
+                        Symptom[] symptoms = symptom.getSymptoms(userId, lastDays, resolvedState, sortBy);
                         if(symptoms != null){
                             responseData.put("symptoms", symptoms);
                             constructResponse(200, "Get Symptoms Successfully", null);
@@ -44,9 +55,35 @@ public class SymptomService extends Service{
                     break;
                 case "notcompleted":
                     // Get Incomplete Symptoms
+                    String startTime = queryStringParameters.getOrDefault("startTime", "0");
+                    String endTime = queryStringParameters.getOrDefault("endTime", String.valueOf(new Date().getTime()));
+                    LOG.info("startTime:{}" + startTime);
+                    try {
+                        Symptom symptom = new Symptom();
+                        Symptom[] symptoms = symptom.getSymptomsByCompletionRange(userId, startTime, endTime);
+                        if(symptoms != null){
+                            responseData.put("symptoms", symptoms);
+                            constructResponse(200, "Get Symptoms Successfully", null);
+                        }else   constructResponse(401, null, "Get Symptoms Failed");
+                    }catch(Exception ex) {
+                        LOG.error("error: {}", ex);
+                    }
                     break;
                 case "review":
-                    // Get Incomplete Symptoms
+                    // Get Review Symptoms
+                    startTime = queryStringParameters.getOrDefault("startTime", "0");
+                    endTime = queryStringParameters.getOrDefault("endTime", String.valueOf(new Date().getTime()));
+                    LOG.info("startTime:{}" + startTime);
+                    try {
+                        Symptom symptom = new Symptom();
+                        Symptom[] symptoms = symptom.getReviewSymptoms(userId, startTime, endTime);
+                        if(symptoms != null){
+                            responseData.put("symptoms", symptoms);
+                            constructResponse(200, "Get Symptoms Successfully", null);
+                        }else   constructResponse(401, null, "Get Symptoms Failed");
+                    }catch(Exception ex) {
+                        LOG.error("error: {}", ex);
+                    }
                     break;
                 default:
                     break;
@@ -58,9 +95,7 @@ public class SymptomService extends Service{
     @Override
     protected void handlePostRequest(){
        
-        // LOG.info("recordTime: {}" + recordTime);
         try{
-
             Gson gson = new Gson();
             Symptom symptom = gson.fromJson(this.body, Symptom.class);
              // create symptom
@@ -71,9 +106,14 @@ public class SymptomService extends Service{
             symptom.setRecordTime(recordTime);
             symptom.setCompletionTime(completionTime);
             symptom.setUserId(userId);
+            symptom.setReviewTime("0");
+            symptom.setResolvedDate("0");
+            symptom.setBetterCondition("");
+            symptom.setWorseCondition("");
+            symptom.setImpactToLife("0");
+            symptom.setOtherRelatedSymptom("");
             LOG.info("symptom: {}" + symptom.toString());
 
-            // LOG.info("symptom: " + symptom.toString());
             Symptom returnedSymptom = symptom.save();
 
             if(returnedSymptom != null){
@@ -117,7 +157,7 @@ public class SymptomService extends Service{
 
     @Override
     protected void handlePatchRequest(){
-
+        handlePutRequest();
     }
 
     @Override
